@@ -83,3 +83,22 @@ html {
   transform: scale(1.05);
   box-shadow: 0 0 20px var(--color-yellow-glow);
 }
+
+/* Responsive Navbar Styles */
+@media (max-width: 768px) {
+  .desktop-nav {
+    display: none !important;
+  }
+  .mobile-toggle {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex !important;
+  }
+  .mobile-toggle {
+    display: none !important;
+  }
+}
