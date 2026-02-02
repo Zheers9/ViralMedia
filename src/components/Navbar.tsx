@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 const navLinks = [
@@ -130,6 +131,26 @@ export default function Navbar() {
                         </a>
                     ))}
 
+                    <Link to="/login" style={{ textDecoration: 'none' }}>
+                        <motion.button
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                                padding: '0.8rem 1rem',
+                                background: 'transparent',
+                                color: 'white',
+                                border: '1px solid rgba(255,255,255,0.2)',
+                                borderRadius: '50px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                marginRight: '-2rem',
+                                fontSize: '0.9rem'
+                            }}
+                        >
+                            Sign In
+                        </motion.button>
+                    </Link>
+
                     <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -233,6 +254,19 @@ export default function Navbar() {
                                     {item.name}
                                 </motion.a>
                             ))}
+                            <motion.div variants={linkVariants}>
+                                <Link to="/login" onClick={() => setIsOpen(false)} style={{
+                                    color: 'white',
+                                    textDecoration: 'none',
+                                    fontSize: '1.5rem',
+                                    fontWeight: 700,
+                                    textTransform: 'uppercase',
+                                    letterSpacing: '0.5px',
+                                    position: 'relative'
+                                }}>
+                                    Access Login
+                                </Link>
+                            </motion.div>
                         </div>
 
                         <motion.div

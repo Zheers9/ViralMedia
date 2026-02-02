@@ -3,10 +3,10 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 
 export default function CustomCursor() {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
-  
+
   const springConfig = { damping: 25, stiffness: 700 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
@@ -19,10 +19,10 @@ export default function CustomCursor() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.tagName.toLowerCase() === 'a' || 
-          target.tagName.toLowerCase() === 'button' ||
-          target.closest('a') || 
-          target.closest('button')) {
+      if (target.tagName.toLowerCase() === 'a' ||
+        target.tagName.toLowerCase() === 'button' ||
+        target.closest('a') ||
+        target.closest('button')) {
         setIsHovered(true);
       } else {
         setIsHovered(false);
@@ -40,7 +40,7 @@ export default function CustomCursor() {
 
   return (
     <>
-      <motion.div 
+      <motion.div
         className="cursor-dot"
         style={{
           position: 'fixed',
@@ -51,14 +51,14 @@ export default function CustomCursor() {
           backgroundColor: '#fbbf24',
           borderRadius: '50%',
           pointerEvents: 'none',
-          zIndex: 9999,
+          zIndex: 100001,
           translateX: cursorX,
           translateY: cursorY,
-          x: 12, // center offset for 8px (16/2 - 8/2 = 4... wait. 16 is ring size. dot should be centered.)
+          x: 12,
           y: 12
         }}
       />
-      <motion.div 
+      <motion.div
         className="cursor-ring"
         style={{
           position: 'fixed',
@@ -69,7 +69,7 @@ export default function CustomCursor() {
           border: '2px solid #7c3aed',
           borderRadius: '50%',
           pointerEvents: 'none',
-          zIndex: 9998,
+          zIndex: 100000,
           translateX: cursorXSpring,
           translateY: cursorYSpring,
         }}

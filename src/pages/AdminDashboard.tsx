@@ -1,439 +1,677 @@
-import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Briefcase, Award, Mail } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { createPortal } from 'react-dom';
+import {
+    LayoutDashboard,
+    Briefcase,
+    Award,
+    Mail,
+    Settings,
+    Search,
+    Bell,
+    User,
+    LogOut,
+    Plus,
+    Eye,
+    Users,
+    Edit2,
+    Trash2
+} from 'lucide-react';
 import CustomCursor from '../components/CustomCursor';
+import StarField from '../components/StarField';
+import { ToastContainer, type ToastMessage, type ToastType } from '../components/Toast';
 
-type Skill = {
-    id: number;
-    name: string;
-    category: string;
-};
+// --- Types ---
+type Skill = { id: number; name: string; category: string };
+type Work = { id: number; title: string; description: string; image: string };
+type Contact = { id: number; name: string; email: string; message: string; date: string };
 
-type Work = {
-    id: number;
-    title: string;
-    description: string;
-    image: string;
-};
+// --- Mock Data for Initial State ---
+const initialSkills: Skill[] = [
+    { id: 1, name: 'Video Editing', category: 'Production' },
+    { id: 2, name: 'Social Media Marketing', category: 'Marketing' },
+    { id: 3, name: 'Graphic Design', category: 'Design' },
+];
 
-type Contact = {
-    id: number;
-    name: string;
-    email: string;
-    message: string;
-    date: string;
-};
+const initialWorks: Work[] = [
+    { id: 1, title: 'Campus Event 2024', description: 'Annual university celebration', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400' },
+    { id: 2, title: 'Sports Highlights', description: 'Basketball championship coverage', image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400' },
+];
 
-export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState<'skills' | 'work' | 'contacts'>('skills');
+const initialContacts: Contact[] = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', message: 'Interested in video production services', date: '2024-01-20' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', message: 'Need help with social media campaign', date: '2024-01-22' },
+];
 
-    // Sample data
-    const [skills, setSkills] = useState<Skill[]>([
-        { id: 1, name: 'Video Editing', category: 'Production' },
-        { id: 2, name: 'Social Media Marketing', category: 'Marketing' },
-        { id: 3, name: 'Graphic Design', category: 'Design' },
-    ]);
+const initialStats = [
+    { label: 'Total Views', value: '2.4M', change: '+12%', icon: Eye, color: '#fbbf24' },
+    { label: 'Projects', value: '142', change: '+5%', icon: Briefcase, color: '#7c3aed' },
+    { label: 'Clients', value: '89', change: '+18%', icon: Users, color: '#34d399' },
+    { label: 'Skills', value: '24', change: '+2', icon: Award, color: '#f472b6' },
+];
 
-    const [works, setWorks] = useState<Work[]>([
-        { id: 1, title: 'Campus Event 2024', description: 'Annual university celebration', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400' },
-        { id: 2, title: 'Sports Highlights', description: 'Basketball championship coverage', image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400' },
-    ]);
+// --- Components ---
 
-    const [contacts, setContacts] = useState<Contact[]>([
-        { id: 1, name: 'John Doe', email: 'john@example.com', message: 'Interested in video production services', date: '2024-01-20' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', message: 'Need help with social media campaign', date: '2024-01-22' },
-    ]);
+const SidebarItem = ({ icon: Icon, label, active, onClick }: { icon: any, label: string, active: boolean, onClick: () => void }) => (
+    <motion.button
+        onClick={onClick}
+        whileHover={{ x: 5, backgroundColor: 'rgba(255,255,255,0.05)' }}
+        whileTap={{ scale: 0.95 }}
+        style={{
+            width: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem',
+            padding: '1rem 1.5rem',
+            background: active ? 'linear-gradient(90deg, rgba(124, 58, 237, 0.15) 0%, transparent 100%)' : 'transparent',
+            border: 'none',
+            borderLeft: active ? '3px solid #7c3aed' : '3px solid transparent',
+            color: active ? '#fff' : '#9ca3af',
+            cursor: 'pointer',
+            textAlign: 'left',
+            fontSize: '0.95rem',
+            fontWeight: active ? 600 : 500,
+            transition: 'color 0.2s',
+            marginBottom: '0.5rem'
+        }}
+    >
+        <Icon size={20} color={active ? '#7c3aed' : 'currentColor'} />
+        {label}
+    </motion.button>
+);
 
-    const tabs = [
-        { id: 'skills', label: 'Skills', icon: <Award size={20} />, count: skills.length },
-        { id: 'work', label: 'Work', icon: <Briefcase size={20} />, count: works.length },
-        { id: 'contacts', label: 'Contacts', icon: <Mail size={20} />, count: contacts.length },
-    ];
-
-    return (
-        <>
-            <CustomCursor />
-            <div style={{
-                minHeight: '100vh',
-                background: 'linear-gradient(135deg, #0f0b1e 0%, #1a1535 100%)',
-                padding: '2rem'
-            }}>
-                {/* Header */}
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    style={{
-                        marginBottom: '3rem'
-                    }}
-                >
-                    <h1 style={{
-                        fontSize: 'clamp(2rem, 5vw, 3rem)',
-                        marginBottom: '0.5rem',
-                        background: 'linear-gradient(to right, #7c3aed, #fbbf24)',
-                        WebkitBackgroundClip: 'text',
-                        WebkitTextFillColor: 'transparent'
-                    }}>
-                        Admin Dashboard
-                    </h1>
-                    <p style={{ color: '#9ca3af', fontSize: '1.1rem' }}>
-                        Manage your viral media content
-                    </p>
-                </motion.div>
-
-                {/* Tabs */}
-                <div style={{
-                    display: 'flex',
-                    gap: '1rem',
-                    marginBottom: '2rem',
-                    flexWrap: 'wrap'
-                }}>
-                    {tabs.map((tab) => (
-                        <motion.button
-                            key={tab.id}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setActiveTab(tab.id as any)}
-                            style={{
-                                padding: '1rem 2rem',
-                                background: activeTab === tab.id
-                                    ? 'linear-gradient(135deg, #7c3aed, #6d28d9)'
-                                    : 'rgba(255,255,255,0.05)',
-                                border: activeTab === tab.id ? 'none' : '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '12px',
-                                color: 'white',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.75rem',
-                                fontSize: '1rem',
-                                fontWeight: activeTab === tab.id ? 'bold' : 'normal',
-                                transition: 'all 0.3s ease',
-                                boxShadow: activeTab === tab.id ? '0 4px 20px rgba(124, 58, 237, 0.4)' : 'none'
-                            }}
-                        >
-                            {tab.icon}
-                            {tab.label}
-                            <span style={{
-                                background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : 'rgba(251,191,36,0.2)',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '20px',
-                                fontSize: '0.875rem',
-                                fontWeight: 'bold'
-                            }}>
-                                {tab.count}
-                            </span>
-                        </motion.button>
-                    ))}
-                </div>
-
-                {/* Content */}
-                <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    {activeTab === 'skills' && <SkillsSection skills={skills} setSkills={setSkills} />}
-                    {activeTab === 'work' && <WorkSection works={works} setWorks={setWorks} />}
-                    {activeTab === 'contacts' && <ContactsSection contacts={contacts} setContacts={setContacts} />}
-                </motion.div>
+const StatCard = ({ stat, index }: { stat: any, index: number }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: index * 0.1 }}
+        whileHover={{ y: -5, boxShadow: '0 10px 30px -10px rgba(0,0,0,0.5)' }}
+        style={{
+            background: 'rgba(255,255,255,0.03)',
+            border: '1px solid rgba(255,255,255,0.05)',
+            borderRadius: '20px',
+            padding: '1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '1rem',
+            backdropFilter: 'blur(10px)'
+        }}
+    >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div style={{ padding: '0.75rem', borderRadius: '12px', background: `${stat.color}20` }}>
+                <stat.icon size={24} color={stat.color} />
             </div>
-        </>
+            <span style={{
+                color: '#34d399',
+                fontSize: '0.85rem',
+                fontWeight: 'bold',
+                background: 'rgba(52, 211, 153, 0.1)',
+                padding: '0.25rem 0.5rem',
+                borderRadius: '20px'
+            }}>
+                {stat.change}
+            </span>
+        </div>
+        <div>
+            <h3 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'white', marginBottom: '0.25rem' }}>{stat.value}</h3>
+            <p style={{ color: '#9ca3af', fontSize: '0.9rem' }}>{stat.label}</p>
+        </div>
+    </motion.div>
+);
+
+// --- Modal Component (Portal) ---
+const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose: () => void; title: string; children: React.ReactNode }) => {
+    // Prevent scrolling when modal is open
+    if (typeof document !== 'undefined') {
+        document.body.style.overflow = isOpen ? 'hidden' : 'unset';
+    }
+
+    return createPortal(
+        <AnimatePresence>
+            {isOpen && (
+                <>
+                    {/* Backdrop */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={onClose}
+                        style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            background: 'rgba(0,0,0,0.7)',
+                            backdropFilter: 'blur(8px)',
+                            zIndex: 9998,
+                        }}
+                    />
+
+                    {/* Modal Content */}
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, x: '-50%', y: '-40%' }}
+                        animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
+                        exit={{ opacity: 0, scale: 0.95, x: '-50%', y: '-40%' }}
+                        style={{
+                            position: 'fixed',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)', // Use translate for centering along with left/top 50%
+                            width: '90%',
+                            maxWidth: '500px',
+                            background: '#1a1535',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+                            borderRadius: '24px',
+                            padding: '2rem',
+                            zIndex: 9999,
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', margin: 0 }}>{title}</h3>
+                            <motion.button
+                                whileHover={{ rotate: 90, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                                whileTap={{ scale: 0.9 }}
+                                onClick={onClose}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    color: '#9ca3af',
+                                    cursor: 'pointer',
+                                    width: '32px',
+                                    height: '32px',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    borderRadius: '50%'
+                                }}
+                            >
+                                <span style={{ fontSize: '1.5rem', lineHeight: 1 }}>&times;</span>
+                            </motion.button>
+                        </div>
+                        {children}
+                    </motion.div>
+                </>
+            )}
+        </AnimatePresence>,
+        document.body
     );
-}
+};
 
-// Skills Section
-function SkillsSection({ skills, setSkills }: { skills: Skill[], setSkills: (skills: Skill[]) => void }) {
-    const [showAddForm, setShowAddForm] = useState(false);
-    const [newSkill, setNewSkill] = useState({ name: '', category: '' });
+// --- Sub-Components (Standard State) ---
 
-    const handleAdd = () => {
-        if (newSkill.name && newSkill.category) {
-            setSkills([...skills, { id: Date.now(), ...newSkill }]);
-            setNewSkill({ name: '', category: '' });
-            setShowAddForm(false);
+function SkillsSection({ showToast }: { showToast: (msg: string, type: ToastType) => void }) {
+    const [skills, setSkills] = useState<Skill[]>(initialSkills);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
+    const [skillToDelete, setSkillToDelete] = useState<number | null>(null);
+    const [formData, setFormData] = useState({ name: '', category: '' });
+
+    const handleSave = () => {
+        if (!formData.name) {
+            showToast("Please enter a skill name!", "error");
+            return;
+        }
+
+        if (editingSkill) {
+            setSkills(skills.map(s => s.id === editingSkill.id ? { ...s, ...formData } : s));
+            showToast("Skill updated successfully!", "success");
+        } else {
+            setSkills([...skills, { id: Date.now(), ...formData }]);
+            showToast("New skill added!", "success");
+        }
+        closeModal();
+    };
+
+    const openAddModal = () => {
+        setEditingSkill(null);
+        setFormData({ name: '', category: '' });
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (skill: Skill) => {
+        setEditingSkill(skill);
+        setFormData({ name: skill.name, category: skill.category });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setEditingSkill(null);
+        setFormData({ name: '', category: '' });
+    };
+
+    const confirmDelete = () => {
+        if (skillToDelete) {
+            setSkills(skills.filter(s => s.id !== skillToDelete));
+            setSkillToDelete(null);
+            showToast("Skill deleted successfully.", "success");
         }
     };
 
-    const handleDelete = (id: number) => {
-        setSkills(skills.filter(s => s.id !== id));
-    };
-
     return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.75rem', color: 'white' }}>Skills Management</h2>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowAddForm(!showAddForm)}
-                    className="btn"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                >
-                    <Plus size={20} />
-                    Add Skill
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 700 }}>Skills Management</h2>
+                <motion.button onClick={openAddModal} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '0.5rem 1rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Plus size={18} /> Add Skill
                 </motion.button>
             </div>
 
-            {showAddForm && (
-                <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    style={{
-                        background: 'rgba(255,255,255,0.05)',
-                        padding: '1.5rem',
-                        borderRadius: '12px',
-                        marginBottom: '2rem',
-                        border: '1px solid rgba(255,255,255,0.1)'
-                    }}
-                >
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+            {/* Add/Edit Modal */}
+            <Modal isOpen={isModalOpen} onClose={closeModal} title={editingSkill ? "Edit Skill" : "Add New Skill"}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Skill Name</label>
                         <input
                             type="text"
-                            placeholder="Skill Name"
-                            value={newSkill.name}
-                            onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
-                            style={{
-                                padding: '0.75rem',
-                                background: 'rgba(0,0,0,0.3)',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '8px',
-                                color: 'white',
-                                fontSize: '1rem'
-                            }}
+                            placeholder="e.g. Video Editing"
+                            value={formData.name}
+                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                            style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none', fontSize: '1rem' }}
                         />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Category</label>
                         <input
                             type="text"
-                            placeholder="Category"
-                            value={newSkill.category}
-                            onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
+                            placeholder="e.g. Production"
+                            value={formData.category}
+                            onChange={e => setFormData({ ...formData, category: e.target.value })}
+                            style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none', fontSize: '1rem' }}
+                        />
+                    </div>
+                    <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={handleSave}
+                        style={{ marginTop: '1rem', padding: '1rem', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4)' }}
+                    >
+                        {editingSkill ? "Update Skill" : "Save Skill"}
+                    </motion.button>
+                </div>
+            </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <Modal isOpen={!!skillToDelete} onClose={() => setSkillToDelete(null)} title="Confirm Delete">
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: '#d1d5db', marginBottom: '2rem', fontSize: '1.1rem' }}>Are you sure you want to delete this skill? This action cannot be undone.</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button onClick={() => setSkillToDelete(null)} style={{ padding: '0.75rem 2rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>No, Cancel</button>
+                        <button onClick={confirmDelete} style={{ padding: '0.75rem 2rem', background: '#ef4444', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>Yes, Delete</button>
+                    </div>
+                </div>
+            </Modal>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+                {skills.map(skill => (
+                    <motion.div key={skill.id} layout initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} style={{ background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <h3 style={{ fontWeight: 600, fontSize: '1.1rem' }}>{skill.name}</h3>
+                                <span style={{ fontSize: '0.8rem', color: '#a78bfa', background: 'rgba(124, 58, 237, 0.1)', padding: '0.2rem 0.5rem', borderRadius: '10px' }}>{skill.category}</span>
+                            </div>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <motion.button onClick={() => openEditModal(skill)} whileHover={{ scale: 1.1 }} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: 'white', cursor: 'pointer' }}><Edit2 size={16} /></motion.button>
+                                <motion.button onClick={() => setSkillToDelete(skill.id)} whileHover={{ scale: 1.1 }} style={{ background: 'rgba(239, 68, 68, 0.1)', border: 'none', padding: '0.5rem', borderRadius: '8px', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></motion.button>
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </motion.div>
+    );
+}
+
+function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) => void }) {
+    const [works, setWorks] = useState<Work[]>(initialWorks);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingWork, setEditingWork] = useState<Work | null>(null);
+    const [workToDelete, setWorkToDelete] = useState<number | null>(null);
+    const [formData, setFormData] = useState({ title: '', description: '', image: '' });
+
+    const handleSave = () => {
+        if (!formData.title) {
+            showToast("Please enter a project title!", "error");
+            return;
+        }
+
+        if (editingWork) {
+            setWorks(works.map(w => w.id === editingWork.id ? { ...w, ...formData } : w));
+            showToast("Project updated successfully!", "success");
+        } else {
+            setWorks([...works, { id: Date.now(), ...formData }]);
+            showToast("New project added!", "success");
+        }
+        closeModal();
+    };
+
+    const openAddModal = () => {
+        setEditingWork(null);
+        setFormData({ title: '', description: '', image: '' });
+        setIsModalOpen(true);
+    };
+
+    const openEditModal = (work: Work) => {
+        setEditingWork(work);
+        setFormData({ title: work.title, description: work.description, image: work.image });
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setEditingWork(null);
+        setFormData({ title: '', description: '', image: '' });
+    };
+
+    const confirmDelete = () => {
+        if (workToDelete) {
+            setWorks(works.filter(w => w.id !== workToDelete));
+            setWorkToDelete(null);
+            showToast("Project deleted.", "success");
+        }
+    };
+
+    return (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
+                <h2 style={{ fontSize: '1.75rem', fontWeight: 700 }}>Work Portfolio</h2>
+                <motion.button onClick={openAddModal} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '0.5rem 1rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Plus size={18} /> Add Work
+                </motion.button>
+            </div>
+
+            {/* Add/Edit Modal */}
+            <Modal isOpen={isModalOpen} onClose={closeModal} title={editingWork ? "Edit Project" : "Add New Project"}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Project Title</label>
+                        <input type="text" placeholder="Project Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Description</label>
+                        <input type="text" placeholder="Description" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                    </div>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Image URL</label>
+                        <input type="text" placeholder="Image URL" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                    </div>
+                    <motion.button onClick={handleSave} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ marginTop: '1rem', padding: '1rem', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4)' }}>
+                        {editingWork ? "Update Project" : "Add Project"}
+                    </motion.button>
+                </div>
+            </Modal>
+
+            {/* Delete Confirmation Modal */}
+            <Modal isOpen={!!workToDelete} onClose={() => setWorkToDelete(null)} title="Confirm Delete">
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: '#d1d5db', marginBottom: '2rem', fontSize: '1.1rem' }}>Are you sure you want to delete this project?</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button onClick={() => setWorkToDelete(null)} style={{ padding: '0.75rem 2rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>No</button>
+                        <button onClick={confirmDelete} style={{ padding: '0.75rem 2rem', background: '#ef4444', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>Yes</button>
+                    </div>
+                </div>
+            </Modal>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                {works.map(work => (
+                    <motion.div key={work.id} whileHover={{ y: -5 }} style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '16px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ height: '180px', background: `url(${work.image}) center/cover` }} />
+                        <div style={{ padding: '1.5rem' }}>
+                            <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '0.5rem' }}>{work.title}</h3>
+                            <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '1rem' }}>{work.description}</p>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <button onClick={() => openEditModal(work)} style={{ flex: 1, padding: '0.5rem', background: 'rgba(255,255,255,0.05)', border: 'none', borderRadius: '8px', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}><Edit2 size={14} /> Edit</button>
+                                <button onClick={() => setWorkToDelete(work.id)} style={{ padding: '0.5rem', background: 'rgba(239,68,68,0.1)', border: 'none', borderRadius: '8px', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={16} /></button>
+                            </div>
+                        </div>
+                    </motion.div>
+                ))}
+            </div>
+        </motion.div>
+    );
+}
+
+function ContactsSection({ showToast }: { showToast: (msg: string, type: ToastType) => void }) {
+    const [contacts, setContacts] = useState<Contact[]>(initialContacts);
+    const [contactToDelete, setContactToDelete] = useState<number | null>(null);
+
+    const confirmDelete = () => {
+        if (contactToDelete) {
+            setContacts(contacts.filter(c => c.id !== contactToDelete));
+            setContactToDelete(null);
+            showToast("Message deleted.", "success");
+        }
+    };
+
+    return (
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 700, marginBottom: '2rem' }}>Contact Messages</h2>
+
+            <Modal isOpen={!!contactToDelete} onClose={() => setContactToDelete(null)} title="Confirm Delete">
+                <div style={{ textAlign: 'center' }}>
+                    <p style={{ color: '#d1d5db', marginBottom: '2rem', fontSize: '1.1rem' }}>Are you sure you want to delete this message?</p>
+                    <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                        <button onClick={() => setContactToDelete(null)} style={{ padding: '0.75rem 2rem', background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>No</button>
+                        <button onClick={confirmDelete} style={{ padding: '0.75rem 2rem', background: '#ef4444', border: 'none', borderRadius: '12px', color: 'white', cursor: 'pointer', fontWeight: 600 }}>Yes</button>
+                    </div>
+                </div>
+            </Modal>
+
+            <div style={{ display: 'grid', gap: '1rem' }}>
+                {contacts.map(contact => (
+                    <motion.div key={contact.id} initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} style={{ display: 'flex', alignItems: 'center', gap: '1rem', background: 'rgba(255,255,255,0.03)', padding: '1.5rem', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                        <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#a78bfa', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#0f0b1e' }}>{contact.name.charAt(0)}</div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                                <h4 style={{ fontSize: '1rem', fontWeight: 600 }}>{contact.name} <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 400 }}>&lt;{contact.email}&gt;</span></h4>
+                                <span style={{ fontSize: '0.8rem', color: '#9ca3af' }}>{contact.date}</span>
+                            </div>
+                            <p style={{ color: '#d1d5db' }}>{contact.message}</p>
+                        </div>
+                        <button onClick={() => setContactToDelete(contact.id)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', opacity: 0.5 }}><Trash2 size={18} /></button>
+                    </motion.div>
+                ))}
+            </div>
+        </motion.div>
+    );
+}
+
+export default function AdminDashboard() {
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [showProfileMenu, setShowProfileMenu] = useState(false);
+    const [toasts, setToasts] = useState<ToastMessage[]>([]);
+
+    const addToast = (message: string, type: ToastType) => {
+        const id = Date.now();
+        setToasts(prev => [...prev, { id, message, type }]);
+    };
+
+    const removeToast = (id: number) => {
+        setToasts(prev => prev.filter(t => t.id !== id));
+    };
+
+    return (
+        <div style={{
+            display: 'flex',
+            minHeight: '100vh',
+            background: '#0f0b1e',
+            color: 'white',
+            fontFamily: '"Inter", sans-serif',
+            position: 'relative',
+            overflow: 'hidden'
+        }}>
+            <CustomCursor />
+            <ToastContainer toasts={toasts} removeToast={removeToast} />
+
+            {/* Background Ambience */}
+            <div style={{ position: 'fixed', width: '100%', height: '100%', zIndex: 0 }}>
+                <StarField />
+            </div>
+
+            {/* Sidebar */}
+            <motion.aside
+                initial={{ x: -100, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                style={{
+                    width: '280px',
+                    background: 'rgba(15, 11, 30, 0.6)',
+                    backdropFilter: 'blur(20px)',
+                    borderRight: '1px solid rgba(255,255,255,0.05)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    zIndex: 10,
+                    position: 'relative'
+                }}
+            >
+                <div style={{ padding: '2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <div style={{ width: '32px', height: '32px', background: '#7c3aed', borderRadius: '8px' }} />
+                    <h1 style={{ fontSize: '1.25rem', fontWeight: 800, letterSpacing: '-0.5px' }}>ViralMedia.</h1>
+                </div>
+
+                <nav style={{ flex: 1, padding: '1rem 0' }}>
+                    <p style={{ padding: '0 1.5rem 0.75rem', fontSize: '0.75rem', fontWeight: 700, color: '#6b7280', textTransform: 'uppercase' }}>Menu</p>
+                    <SidebarItem icon={LayoutDashboard} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+                    <SidebarItem icon={Briefcase} label="Work" active={activeTab === 'work'} onClick={() => setActiveTab('work')} />
+                    <SidebarItem icon={Award} label="Skills" active={activeTab === 'skills'} onClick={() => setActiveTab('skills')} />
+                    <SidebarItem icon={Mail} label="Contacts" active={activeTab === 'contacts'} onClick={() => setActiveTab('contacts')} />
+                </nav>
+
+                <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                    <SidebarItem icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+                    <SidebarItem icon={LogOut} label="Logout" active={false} onClick={() => window.location.href = '/'} />
+                </div>
+            </motion.aside>
+
+            {/* Main Content */}
+            <main style={{ flex: 1, display: 'flex', flexDirection: 'column', zIndex: 5, maxHeight: '100vh', overflowY: 'auto', position: 'relative' }}>
+
+                {/* Header */}
+                <header style={{
+                    padding: '1.5rem 3rem',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                    background: 'rgba(15, 11, 30, 0.4)',
+                    backdropFilter: 'blur(10px)',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 20
+                }}>
+                    <div style={{ position: 'relative', width: '300px' }}>
+                        <Search size={18} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }} />
+                        <input
+                            type="text"
+                            placeholder="Search anything..."
                             style={{
-                                padding: '0.75rem',
-                                background: 'rgba(0,0,0,0.3)',
+                                width: '100%',
+                                padding: '0.75rem 1rem 0.75rem 2.5rem',
+                                background: 'rgba(255,255,255,0.05)',
                                 border: '1px solid rgba(255,255,255,0.1)',
-                                borderRadius: '8px',
+                                borderRadius: '50px',
                                 color: 'white',
-                                fontSize: '1rem'
+                                fontSize: '0.9rem',
+                                outline: 'none'
                             }}
                         />
                     </div>
-                    <button onClick={handleAdd} className="btn">Save Skill</button>
-                </motion.div>
-            )}
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                {skills.map((skill) => (
-                    <motion.div
-                        key={skill.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        whileHover={{ y: -5 }}
-                        style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            padding: '1.5rem',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            position: 'relative'
-                        }}
-                    >
-                        <div style={{ marginBottom: '1rem' }}>
-                            <span style={{
-                                background: 'rgba(124,58,237,0.2)',
-                                color: '#a78bfa',
-                                padding: '0.25rem 0.75rem',
-                                borderRadius: '20px',
-                                fontSize: '0.75rem',
-                                fontWeight: 'bold'
-                            }}>
-                                {skill.category}
-                            </span>
-                        </div>
-                        <h3 style={{ fontSize: '1.25rem', color: 'white', marginBottom: '1rem' }}>{skill.name}</h3>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                style={{
-                                    padding: '0.5rem',
-                                    background: 'rgba(251,191,36,0.2)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    color: '#fbbf24',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <Edit2 size={16} />
-                            </motion.button>
-                            <motion.button
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.9 }}
-                                onClick={() => handleDelete(skill.id)}
-                                style={{
-                                    padding: '0.5rem',
-                                    background: 'rgba(239,68,68,0.2)',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    color: '#ef4444',
-                                    cursor: 'pointer'
-                                }}
-                            >
-                                <Trash2 size={16} />
-                            </motion.button>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-// Work Section
-function WorkSection({ works, setWorks }: { works: Work[], setWorks: (works: Work[]) => void }) {
-    const handleDelete = (id: number) => {
-        setWorks(works.filter(w => w.id !== id));
-    };
-
-    return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.75rem', color: 'white' }}>Work Portfolio</h2>
-                <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="btn"
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
-                >
-                    <Plus size={20} />
-                    Add Work
-                </motion.button>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '1.5rem' }}>
-                {works.map((work) => (
-                    <motion.div
-                        key={work.id}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        whileHover={{ y: -5 }}
-                        style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            overflow: 'hidden'
-                        }}
-                    >
-                        <div style={{
-                            height: '200px',
-                            backgroundImage: `url(${work.image})`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center'
-                        }} />
-                        <div style={{ padding: '1.5rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', color: 'white', marginBottom: '0.5rem' }}>{work.title}</h3>
-                            <p style={{ color: '#9ca3af', marginBottom: '1rem' }}>{work.description}</p>
-                            <div style={{ display: 'flex', gap: '0.5rem' }}>
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    style={{
-                                        padding: '0.5rem 1rem',
-                                        background: 'rgba(251,191,36,0.2)',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        color: '#fbbf24',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}
-                                >
-                                    <Edit2 size={16} />
-                                    Edit
-                                </motion.button>
-                                <motion.button
-                                    whileHover={{ scale: 1.05 }}
-                                    whileTap={{ scale: 0.95 }}
-                                    onClick={() => handleDelete(work.id)}
-                                    style={{
-                                        padding: '0.5rem 1rem',
-                                        background: 'rgba(239,68,68,0.2)',
-                                        border: 'none',
-                                        borderRadius: '8px',
-                                        color: '#ef4444',
-                                        cursor: 'pointer',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '0.5rem'
-                                    }}
-                                >
-                                    <Trash2 size={16} />
-                                    Delete
-                                </motion.button>
-                            </div>
-                        </div>
-                    </motion.div>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-// Contacts Section
-function ContactsSection({ contacts, setContacts }: { contacts: Contact[], setContacts: (contacts: Contact[]) => void }) {
-    const handleDelete = (id: number) => {
-        setContacts(contacts.filter(c => c.id !== id));
-    };
-
-    return (
-        <div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h2 style={{ fontSize: '1.75rem', color: 'white' }}>Contact Messages</h2>
-            </div>
-
-            <div style={{ display: 'grid', gap: '1rem' }}>
-                {contacts.map((contact) => (
-                    <motion.div
-                        key={contact.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        whileHover={{ x: 5 }}
-                        style={{
-                            background: 'rgba(255,255,255,0.05)',
-                            padding: '1.5rem',
-                            borderRadius: '12px',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            display: 'grid',
-                            gridTemplateColumns: '1fr auto',
-                            gap: '1rem',
-                            alignItems: 'start'
-                        }}
-                    >
-                        <div>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.5rem' }}>
-                                <h3 style={{ fontSize: '1.25rem', color: 'white' }}>{contact.name}</h3>
-                                <span style={{ color: '#9ca3af', fontSize: '0.875rem' }}>{contact.date}</span>
-                            </div>
-                            <p style={{ color: '#a78bfa', fontSize: '0.9rem', marginBottom: '0.75rem' }}>{contact.email}</p>
-                            <p style={{ color: '#d1d5db', lineHeight: 1.6 }}>{contact.message}</p>
-                        </div>
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => handleDelete(contact.id)}
-                            style={{
-                                padding: '0.5rem',
-                                background: 'rgba(239,68,68,0.2)',
-                                border: 'none',
-                                borderRadius: '8px',
-                                color: '#ef4444',
-                                cursor: 'pointer'
-                            }}
-                        >
-                            <Trash2 size={20} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                        <motion.button whileHover={{ scale: 1.1 }} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', position: 'relative' }}>
+                            <Bell size={20} />
+                            <span style={{ position: 'absolute', top: -2, right: -2, width: '8px', height: '8px', background: '#ef4444', borderRadius: '50%' }} />
                         </motion.button>
-                    </motion.div>
-                ))}
-            </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', cursor: 'pointer' }} onClick={() => setShowProfileMenu(!showProfileMenu)}>
+                            <div style={{ textAlign: 'right' }}>
+                                <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>Miqdad</p>
+                                <p style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Admin</p>
+                            </div>
+                            <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #7c3aed, #fbbf24)', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <User size={20} color="white" />
+                            </div>
+                        </div>
+                    </div>
+                </header>
+
+                {/* Dashboard Content */}
+                <div style={{ padding: '3rem', maxWidth: '1600px', margin: '0 auto', width: '100%' }}>
+                    <AnimatePresence mode="wait">
+                        {activeTab === 'dashboard' && (
+                            <motion.div
+                                key="dashboard"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                transition={{ duration: 0.3 }}
+                            >
+                                <div style={{ marginBottom: '3rem' }}>
+                                    <h2 style={{ fontSize: '2rem', fontWeight: 700, marginBottom: '0.5rem' }}>Welcome back, Miqdad! 👋</h2>
+                                    <p style={{ color: '#9ca3af' }}>Here's what's happening with your content today.</p>
+                                </div>
+
+                                {/* Stats Grid */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '3rem' }}>
+                                    {initialStats.map((stat, i) => (
+                                        <StatCard key={i} stat={stat} index={i} />
+                                    ))}
+                                </div>
+
+                                {/* Recent Activity Graphic (Simulated) */}
+                                <div style={{ background: 'rgba(255,255,255,0.03)', borderRadius: '24px', padding: '2rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+                                        <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Engagement Overview</h3>
+                                        <button style={{ background: 'rgba(255,255,255,0.05)', border: 'none', padding: '0.5rem 1rem', borderRadius: '8px', color: '#9ca3af', fontSize: '0.85rem' }}>This Week</button>
+                                    </div>
+                                    {/* Simulated Chart Bars */}
+                                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', height: '200px', gap: '1rem' }}>
+                                        {[40, 65, 35, 85, 55, 95, 70].map((h, i) => (
+                                            <motion.div
+                                                key={i}
+                                                initial={{ height: 0 }}
+                                                animate={{ height: `${h}%` }}
+                                                transition={{ duration: 1, delay: i * 0.1, type: 'spring' }}
+                                                style={{
+                                                    width: '100%',
+                                                    background: i === 5 ? 'linear-gradient(to top, #7c3aed, #a78bfa)' : 'rgba(255,255,255,0.05)',
+                                                    borderRadius: '8px 8px 0 0',
+                                                    position: 'relative'
+                                                }}
+                                            >
+                                                <div style={{ position: 'absolute', bottom: '-25px', left: '50%', transform: 'translateX(-50%)', color: '#6b7280', fontSize: '0.75rem' }}>
+                                                    {['M', 'T', 'W', 'T', 'F', 'S', 'S'][i]}
+                                                </div>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                            </motion.div>
+                        )}
+
+                        {activeTab === 'skills' && <SkillsSection showToast={addToast} />}
+                        {activeTab === 'work' && <WorkSection showToast={addToast} />}
+                        {activeTab === 'contacts' && <ContactsSection showToast={addToast} />}
+
+                        {/* Placeholder for Settings */}
+                        {activeTab === 'settings' && (
+                            <motion.div
+                                key="settings"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -20 }}
+                                style={{ textAlign: 'center', padding: '4rem' }}
+                            >
+                                <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚙️</div>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Settings</h2>
+                                <p style={{ color: '#9ca3af' }}>Configure your dashboard preferences here.</p>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </main>
         </div>
     );
 }
