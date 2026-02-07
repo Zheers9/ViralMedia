@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { Mail, ArrowRight } from 'lucide-react';
 import CustomCursor from '../components/CustomCursor';
 import StarField from '../components/StarField';
+import TextInput from '../components/inputs/TextInput';
+import PasswordInput from '../components/inputs/PasswordInput';
 
 export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -99,97 +100,22 @@ export default function Login() {
                 </motion.div>
 
                 <form onSubmit={handleSubmit}>
-                    <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem', position: 'relative' }}>
-                        <label style={{
-                            display: 'block',
-                            marginBottom: '0.5rem',
-                            fontSize: '0.875rem',
-                            fontWeight: 600,
-                            color: 'var(--color-text)'
-                        }}>Email</label>
-                        <div style={{ position: 'relative' }}>
-                            <Mail size={20} style={{
-                                position: 'absolute',
-                                left: '1rem',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: 'var(--color-text-muted)'
-                            }} />
-                            <input
-                                type="email"
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="admin@viralmedia.com"
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem 1rem 1rem 3rem',
-                                    background: 'rgba(0, 0, 0, 0.2)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    borderRadius: '12px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = 'var(--color-purple-primary)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
-                            />
-                        </div>
+                    <motion.div variants={itemVariants}>
+                        <TextInput
+                            label="Email Address"
+                            icon={Mail}
+                            type="email"
+                            required
+                            onChange={(e: any) => setEmail(e.target.value)}
+                        />
                     </motion.div>
 
-                    <motion.div variants={itemVariants} style={{ marginBottom: '2.5rem', position: 'relative' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                            <label style={{ fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text)' }}>Password</label>
-                        </div>
-                        <div style={{ position: 'relative' }}>
-                            <Lock size={20} style={{
-                                position: 'absolute',
-                                left: '1rem',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: 'var(--color-text-muted)'
-                            }} />
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                style={{
-                                    width: '100%',
-                                    padding: '1rem 3rem 1rem 3rem', // Extra padding right for eye icon
-                                    background: 'rgba(0, 0, 0, 0.2)',
-                                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                                    borderRadius: '12px',
-                                    color: 'white',
-                                    fontSize: '1rem',
-                                    outline: 'none',
-                                    transition: 'all 0.3s ease'
-                                }}
-                                onFocus={(e) => e.target.style.borderColor = 'var(--color-purple-primary)'}
-                                onBlur={(e) => e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                style={{
-                                    position: 'absolute',
-                                    right: '1rem',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'var(--color-text-muted)',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    padding: 0
-                                }}
-                            >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
-                        </div>
+                    <motion.div variants={itemVariants}>
+                        <PasswordInput
+                            label="Password"
+                            required
+                            onChange={(e: any) => setPassword(e.target.value)}
+                        />
                     </motion.div>
 
                     <motion.button

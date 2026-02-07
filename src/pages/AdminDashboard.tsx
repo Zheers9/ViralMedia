@@ -20,6 +20,8 @@ import {
 import CustomCursor from '../components/CustomCursor';
 import StarField from '../components/StarField';
 import { ToastContainer, type ToastMessage, type ToastType } from '../components/Toast';
+import TextInput from '../components/inputs/TextInput';
+import ImageUploadInput from '../components/inputs/ImageUploadInput';
 
 // --- Types ---
 type Skill = { id: number; name: string; category: string };
@@ -263,23 +265,19 @@ function SkillsSection({ showToast }: { showToast: (msg: string, type: ToastType
             <Modal isOpen={isModalOpen} onClose={closeModal} title={editingSkill ? "Edit Skill" : "Add New Skill"}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Skill Name</label>
-                        <input
-                            type="text"
+                        <TextInput
+                            label="Skill Name"
                             placeholder="e.g. Video Editing"
                             value={formData.name}
                             onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none', fontSize: '1rem' }}
                         />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Category</label>
-                        <input
-                            type="text"
+                        <TextInput
+                            label="Category"
                             placeholder="e.g. Production"
                             value={formData.category}
                             onChange={e => setFormData({ ...formData, category: e.target.value })}
-                            style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none', fontSize: '1rem' }}
                         />
                     </div>
                     <motion.button
@@ -386,16 +384,34 @@ function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) 
             <Modal isOpen={isModalOpen} onClose={closeModal} title={editingWork ? "Edit Project" : "Add New Project"}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Project Title</label>
-                        <input type="text" placeholder="Project Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                        <TextInput
+                            label="Project Title"
+                            placeholder="Project Title"
+                            value={formData.title}
+                            onChange={e => setFormData({ ...formData, title: e.target.value })}
+                        />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Description</label>
-                        <input type="text" placeholder="Description" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                        <TextInput
+                            label="Description"
+                            placeholder="Description"
+                            value={formData.description}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                        />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Image URL</label>
-                        <input type="text" placeholder="Image URL" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                        <ImageUploadInput
+                            label="Project Image"
+                            initialImage={formData.image}
+                            onImageSelected={(file) => {
+                                if (file) {
+                                    const url = URL.createObjectURL(file);
+                                    setFormData({ ...formData, image: url });
+                                } else {
+                                    setFormData({ ...formData, image: '' });
+                                }
+                            }}
+                        />
                     </div>
                     <motion.button onClick={handleSave} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ marginTop: '1rem', padding: '1rem', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4)' }}>
                         {editingWork ? "Update Project" : "Add Project"}
