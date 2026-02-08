@@ -1,40 +1,43 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Camera, Share2, PenTool, Zap } from 'lucide-react';
 import { useRef } from 'react';
-
-const services = [
-    {
-        icon: <Camera size={60} />,
-        title: "Video Production",
-        desc: "Cinematic storytelling for campus events and promotional content. We capture the essence of university life with stunning visuals.",
-        bgImage: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1920&q=80"
-    },
-    {
-        icon: <Share2 size={60} />,
-        title: "Social Growth",
-        desc: "Viral strategies to explode your university's online presence. We turn academic content into engaging social media phenomena.",
-        bgImage: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1920&q=80"
-    },
-    {
-        icon: <PenTool size={60} />,
-        title: "Creative Branding",
-        desc: "Bold visual identities that stand out in the academic world. We create memorable brands that resonate with students.",
-        bgImage: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=1920&q=80"
-    },
-    {
-        icon: <Zap size={60} />,
-        title: "Live Coverage",
-        desc: "Real-time, high-energy coverage of sports and ceremonies. We bring the excitement of campus events to life.",
-        bgImage: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=80"
-    }
-];
+import type { ReactNode } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Services() {
+    const { t } = useLanguage();
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"]
     });
+
+    const services = [
+        {
+            icon: <Camera size={60} />,
+            title: t('service_video_title'),
+            desc: t('service_video_desc'),
+            bgImage: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=1920&q=80"
+        },
+        {
+            icon: <Share2 size={60} />,
+            title: t('service_social_title'),
+            desc: t('service_social_desc'),
+            bgImage: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?w=1920&q=80"
+        },
+        {
+            icon: <PenTool size={60} />,
+            title: t('service_branding_title'),
+            desc: t('service_branding_desc'),
+            bgImage: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=1920&q=80"
+        },
+        {
+            icon: <Zap size={60} />,
+            title: t('service_live_title'),
+            desc: t('service_live_desc'),
+            bgImage: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?w=1920&q=80"
+        }
+    ];
 
     return (
         <div id="services" ref={containerRef} style={{ position: 'relative' }}>
@@ -84,10 +87,10 @@ export default function Services() {
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent'
                 }}>
-                    Our Power
+                    {t('services_title')}
                 </h2>
                 <p style={{ color: '#9ca3af', fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto' }}>
-                    Scroll to explore our capabilities
+                    {t('services_subtitle')}
                 </p>
             </motion.div>
 
@@ -99,7 +102,14 @@ export default function Services() {
     );
 }
 
-function ServiceSection({ service }: { service: typeof services[0] }) {
+interface Service {
+    icon: ReactNode;
+    title: string;
+    desc: string;
+    bgImage: string;
+}
+
+function ServiceSection({ service }: { service: Service }) {
     const sectionRef = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: sectionRef,

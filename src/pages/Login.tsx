@@ -6,9 +6,11 @@ import CustomCursor from '../components/CustomCursor';
 import StarField from '../components/StarField';
 import TextInput from '../components/inputs/TextInput';
 import PasswordInput from '../components/inputs/PasswordInput';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Login() {
     const navigate = useNavigate();
+    const { t } = useLanguage();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +21,7 @@ export default function Login() {
 
         // Simulate login delay
         setTimeout(() => {
+            console.log('Login attempt:', email, password);
             setIsLoading(false);
             navigate('/admin');
         }, 1500);
@@ -94,15 +97,15 @@ export default function Login() {
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent'
                     }}>
-                        Welcome Back
+                        {t('login_welcome')}
                     </h2>
-                    <p style={{ color: 'var(--color-text-muted)' }}>Enter your credentials to access the admin panel.</p>
+                    <p style={{ color: 'var(--color-text-muted)' }}>{t('login_subtitle')}</p>
                 </motion.div>
 
                 <form onSubmit={handleSubmit}>
                     <motion.div variants={itemVariants}>
                         <TextInput
-                            label="Email Address"
+                            label={t('login_email')}
                             icon={Mail}
                             type="email"
                             required
@@ -112,7 +115,7 @@ export default function Login() {
 
                     <motion.div variants={itemVariants}>
                         <PasswordInput
-                            label="Password"
+                            label={t('login_password')}
                             required
                             onChange={(e: any) => setPassword(e.target.value)}
                         />
@@ -142,9 +145,9 @@ export default function Login() {
                             transition: 'all 0.3s ease'
                         }}
                     >
-                        {isLoading ? 'Signing in...' : (
+                        {isLoading ? t('login_loading') : (
                             <>
-                                Sign In <ArrowRight size={20} />
+                                {t('login_button')} <ArrowRight size={20} />
                             </>
                         )}
                     </motion.button>

@@ -1,15 +1,18 @@
 import { motion } from 'framer-motion';
-
-const projects = [
-    { title: "Campus Life 2024", category: "Video", color: "#4c1d95" },
-    { title: "Science Fair Promo", category: "Branding", color: "#5b21b6" },
-    { title: "Graduation Live", category: "Event", color: "#6d28d9" },
-    { title: "Student Union", category: "Social", color: "#7c3aed" },
-    { title: "Sports Week", category: "Photography", color: "#8b5cf6" },
-    { title: "Tech Expo", category: "Design", color: "#a78bfa" },
-];
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Portfolio() {
+    const { t } = useLanguage();
+
+    const projects = [
+        { title: t('project_campus_life'), category: t('category_video'), color: "#4c1d95" },
+        { title: t('project_science_fair'), category: t('category_branding'), color: "#5b21b6" },
+        { title: t('project_graduation'), category: t('category_event'), color: "#6d28d9" },
+        { title: t('project_student_union'), category: t('category_social'), color: "#7c3aed" },
+        { title: t('project_sports_week'), category: t('category_photography'), color: "#8b5cf6" },
+        { title: t('project_tech_expo'), category: t('category_design'), color: "#a78bfa" },
+    ];
+
     return (
         <section id="portfolio" style={{ padding: '8rem 0' }}>
             <div className="container">
@@ -26,7 +29,7 @@ export default function Portfolio() {
                         paddingRight: '1rem'
                     }}
                 >
-                    Selected Work
+                    {t('portfolio_title')}
                 </motion.h2>
 
                 <div style={{

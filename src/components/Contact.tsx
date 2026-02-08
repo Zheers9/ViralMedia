@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Contact() {
+    const { t } = useLanguage();
     return (
         <section id="contact" style={{ padding: '8rem 0', background: '#0a0a0a', position: 'relative' }}>
             <div className="container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -10,7 +12,7 @@ export default function Contact() {
                     viewport={{ once: true }}
                     style={{ fontSize: '3rem', marginBottom: '3rem', textAlign: 'center' }}
                 >
-                    Ready to go <span className="text-yellow">Viral</span>?
+                    {t('contact_title')} <span className="text-yellow">{t('contact_title_highlight')}</span>?
                 </motion.h2>
 
                 <motion.form
@@ -24,23 +26,23 @@ export default function Contact() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                         <input
                             type="text"
-                            placeholder="Name"
+                            placeholder={t('contact_name_placeholder')}
                             style={inputStyle}
                         />
                         <input
                             type="email"
-                            placeholder="Email"
+                            placeholder={t('contact_email_placeholder')}
                             style={inputStyle}
                         />
                     </div>
                     <input
                         type="text"
-                        placeholder="Subject"
+                        placeholder={t('contact_subject_placeholder')}
                         style={inputStyle}
                     />
                     <textarea
                         rows={5}
-                        placeholder="Tell us about your project..."
+                        placeholder={t('contact_message_placeholder')}
                         style={inputStyle}
                     />
 
@@ -50,12 +52,12 @@ export default function Contact() {
                         className="btn"
                         style={{ marginTop: '1rem', width: '100%', borderRadius: '8px' }}
                     >
-                        Send Message
+                        {t('contact_send_btn')}
                     </motion.button>
                 </motion.form>
 
                 <footer style={{ marginTop: '6rem', color: '#6b7280', fontSize: '0.9rem' }}>
-                    &copy; 2026 Viral Media. All rights reserved.
+                    {t('footer_rights')}
                 </footer>
             </div>
         </section>
