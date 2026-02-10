@@ -39,11 +39,7 @@ type Contact = { id: number; name: string; email: string; message: string; date:
 type SocialLink = { id: number; platform: string; url: string; icon: string; bgColor: string; textColor: string };
 
 // --- Mock Data for Initial State ---
-const initialSkills: Skill[] = [
-    { id: 1, name: 'Video Editing', category: 'Production', description: '', image: '' },
-    { id: 2, name: 'Social Media Marketing', category: 'Marketing', description: '', image: '' },
-    { id: 3, name: 'Graphic Design', category: 'Design', description: '', image: '' },
-];
+
 
 const initialWorks: Work[] = [
     { id: 1, title: 'Campus Event 2024', description: 'Annual university celebration', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400' },

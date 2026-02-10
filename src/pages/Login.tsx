@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { User, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { User, ArrowRight } from 'lucide-react';
 import CustomCursor from '../components/CustomCursor';
 import StarField from '../components/StarField';
-import TextInput from '../components/inputs/TextInput';
+
 import PasswordInput from '../components/inputs/PasswordInput';
 import { useLanguage } from '../context/LanguageContext';
 
