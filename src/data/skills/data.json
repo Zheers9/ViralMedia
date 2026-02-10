@@ -1,22 +1,30 @@
 [
-    {
-        "id": 1,
-        "name": "Video Editing",
-        "category": "Production"
-    },
-    {
-        "id": 2,
-        "name": "Social Media Marketing",
-        "category": "Marketing"
-    },
-    {
-        "id": 3,
-        "name": "Graphic Design",
-        "category": "Design"
-    },
-    {
-        "id": 4,
-        "name": "Event Photography",
-        "category": "Production"
-    }
+  {
+    "id": 1,
+    "name": "Video Editing",
+    "category": "Production",
+    "description": "",
+    "image": "/images/skills/1701181684219 (1)-1770712778205-208529055.png"
+  },
+  {
+    "id": 2,
+    "name": "Social Media Marketing",
+    "category": "Marketing",
+    "description": "",
+    "image": ""
+  },
+  {
+    "id": 3,
+    "name": "Graphic Design",
+    "category": "Design",
+    "description": "",
+    "image": ""
+  },
+  {
+    "id": 4,
+    "name": "Event Photography",
+    "category": "Production",
+    "description": "",
+    "image": ""
+  }
 ]

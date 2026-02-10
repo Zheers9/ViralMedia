@@ -19,7 +19,8 @@ app.use(express.json());
 const DATA_PATHS = {
     work: join(__dirname, 'src', 'data', 'work', 'data.json'),
     skills: join(__dirname, 'src', 'data', 'skills', 'data.json'),
-    contact: join(__dirname, 'src', 'data', 'contact', 'data.json')
+    contact: join(__dirname, 'src', 'data', 'contact', 'data.json'),
+    social_links: join(__dirname, 'src', 'data', 'social_links', 'data.json')
 };
 
 const IMAGE_PATHS = {

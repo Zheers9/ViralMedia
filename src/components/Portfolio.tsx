@@ -1,15 +1,19 @@
 import { motion } from 'framer-motion';
-
-const projects = [
-    { title: "Campus Life 2024", category: "Video", color: "#4c1d95" },
-    { title: "Science Fair Promo", category: "Branding", color: "#5b21b6" },
-    { title: "Graduation Live", category: "Event", color: "#6d28d9" },
-    { title: "Student Union", category: "Social", color: "#7c3aed" },
-    { title: "Sports Week", category: "Photography", color: "#8b5cf6" },
-    { title: "Tech Expo", category: "Design", color: "#a78bfa" },
-];
+import { useState, useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Portfolio() {
+    const { t } = useLanguage();
+
+    const [projects, setProjects] = useState<any[]>([]);
+
+    useEffect(() => {
+        fetch('http://localhost:3001/api/work')
+            .then(res => res.json())
+            .then(data => setProjects(data))
+            .catch(err => console.error("Failed to load portfolio", err));
+    }, []);
+
     return (
         <section id="portfolio" style={{ padding: '8rem 0' }}>
             <div className="container">
@@ -26,7 +30,7 @@ export default function Portfolio() {
                         paddingRight: '1rem'
                     }}
                 >
-                    Selected Work
+                    {t('portfolio_title')}
                 </motion.h2>
 
                 <div style={{
@@ -44,7 +48,10 @@ export default function Portfolio() {
                             whileHover={{ scale: 1.03 }}
                             style={{
                                 height: '300px',
-                                backgroundColor: project.color,
+                                backgroundColor: '#1a1a1a', // Fallback color
+                                backgroundImage: project.image ? `url('${project.image}')` : undefined,
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center',
                                 borderRadius: '16px',
                                 position: 'relative',
                                 overflow: 'hidden',
@@ -61,7 +68,7 @@ export default function Portfolio() {
                                 padding: '2rem'
                             }}>
                                 <span style={{ color: '#fbbf24', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' }}>
-                                    {project.category}
+                                    {project.category || 'Portfolio'}
                                 </span>
                                 <h3 style={{ fontSize: '1.8rem', margin: 0 }}>{project.title}</h3>
                             </div>

@@ -1,0 +1,18 @@
+[
+  {
+    "platform": "test",
+    "url": "07722986688",
+    "icon": "jsdnc",
+    "bgColor": "#000000",
+    "textColor": "#ffffff",
+    "id": 1770715199229
+  },
+  {
+    "platform": "__PHONE__",
+    "url": "07722986688",
+    "icon": "phone",
+    "bgColor": "#000000",
+    "textColor": "#ffffff",
+    "id": 1770716049231
+  }
+]

@@ -1,7 +1,9 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useEffect } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function Hero() {
+    const { t } = useLanguage();
     // Mouse position tracking
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
@@ -126,10 +128,11 @@ export default function Hero() {
                         background: 'linear-gradient(to right, #f3f4f6, #9ca3af)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
-                        letterSpacing: '-0.02em'
+                        letterSpacing: '-0.02em',
+                        fontFamily: "'Inter', sans-serif"
                     }}
                 >
-                    VIRAL <span style={{ color: 'transparent', WebkitTextStroke: '2px #fbbf24' }}>MEDIA</span>
+                    {t('hero_title_1')} <span style={{ color: 'transparent', WebkitTextStroke: '2px #fbbf24' }}>{t('hero_title_2')}</span>
                 </motion.h1>
 
                 <motion.p
@@ -143,7 +146,7 @@ export default function Hero() {
                         margin: '0 auto 3rem auto'
                     }}
                 >
-                    Reinventing University Media with <span style={{ color: '#fbbf24' }}>shocking</span> creativity.
+                    {t('hero_subtitle')}
                 </motion.p>
 
                 <motion.button
@@ -153,7 +156,7 @@ export default function Hero() {
                     transition={{ delay: 0.6, duration: 0.5 }}
                     onClick={() => document.getElementById('portfolio')?.scrollIntoView({ behavior: 'smooth' })}
                 >
-                    Explore Work
+                    {t('hero_explore')}
                 </motion.button>
             </div>
 
