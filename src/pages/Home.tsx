@@ -9,7 +9,6 @@ export default function Home() {
     return (
         <main style={{ position: 'relative', width: '100%', overflow: 'hidden' }}>
             <CustomCursor />
-
             <Navbar />
 
             <Hero />

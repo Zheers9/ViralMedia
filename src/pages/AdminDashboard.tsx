@@ -488,7 +488,26 @@ function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) 
                     </div>
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>{t('description')}</label>
-                        <input type="text" placeholder={t('description')} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                        <textarea
+                            placeholder={t('description')}
+                            value={formData.description}
+                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                            rows={5}
+                            style={{
+                                width: '100%',
+                                padding: '1rem',
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                color: 'white',
+                                borderRadius: '12px',
+                                outline: 'none',
+                                resize: 'vertical',
+                                minHeight: '140px',
+                                fontFamily: 'inherit',
+                                fontSize: '0.95rem',
+                                lineHeight: 1.6
+                            }}
+                        />
                     </div>
                     <div>
                         <ImageUploadInput
@@ -1011,7 +1030,7 @@ export default function AdminDashboard() {
                 .work-card { background: rgba(255,255,255,0.03); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
                 .work-image { height: 180px; }
                 .work-title { font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem; }
-                .work-desc { color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem; }
+                .work-desc { color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem; white-space: pre-line; }
                 .action-buttons { display: flex; gap: 0.5rem; }
                 .edit-btn { flex: 1; padding: 0.5rem; background: rgba(255,255,255,0.05); border: none; border-radius: 8px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
                 .delete-btn { padding: 0.5rem; background: rgba(239,68,68,0.1); border: none; border-radius: 8px; color: #ef4444; cursor: pointer; }

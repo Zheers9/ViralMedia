@@ -94,6 +94,8 @@ export default function Login() {
         }}>
             <StarField />
 
+            <CustomCursor />
+
             {/* Gradient Overlay for better text visibility */}
             <div style={{
                 position: 'absolute',
@@ -105,8 +107,6 @@ export default function Login() {
                 zIndex: 1,
                 pointerEvents: 'none'
             }} />
-
-            <CustomCursor />
 
             <motion.div
                 variants={containerVariants}

@@ -1,18 +1,34 @@
 [
   {
-    "platform": "test",
-    "url": "07722986688",
-    "icon": "jsdnc",
-    "bgColor": "#000000",
-    "textColor": "#ffffff",
-    "id": 1770715199229
-  },
-  {
     "platform": "__PHONE__",
-    "url": "07722986688",
+    "url": "07708195555",
     "icon": "phone",
     "bgColor": "#000000",
     "textColor": "#ffffff",
     "id": 1770716049231
+  },
+  {
+    "platform": "Facebook",
+    "url": "https://www.facebook.com/share/1F68CS9qkG/?mibextid=wwXIfr",
+    "icon": "",
+    "bgColor": "#1842ec",
+    "textColor": "#fffafa",
+    "id": 1770740601028
+  },
+  {
+    "platform": "Instagram",
+    "url": "https://www.instagram.com/viralmedia_iq?igsh=bGt5dnZ4bXI4YmQ%3D&utm_source=qr",
+    "icon": "",
+    "bgColor": "#ed0c45",
+    "textColor": "#ffffff",
+    "id": 1770740676674
+  },
+  {
+    "platform": "TikTok",
+    "url": "https://www.tiktok.com/@viral.medie?_r=1&_t=ZS-932EVHBOQT3",
+    "icon": "",
+    "bgColor": "#000000",
+    "textColor": "#ffffff",
+    "id": 1770740705321
   }
 ]
