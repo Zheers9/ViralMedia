@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { User, Lock, ArrowRight, Eye, EyeOff } from 'lucide-react';
 import CustomCursor from '../components/CustomCursor';
 import StarField from '../components/StarField';
 
@@ -11,16 +11,53 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+        if (isAuthenticated) {
+            navigate('/admin');
+        }
+    }, [navigate]);
+
+    // Pre-computed SHA-256 hashes for 'adminviral' and 'adminq1w2e3r$'
+    const USER_HASH = 'ca2910d9b75c284d555d92b00d8fe3a03e26e48e18f20a7ef6ac1fed2af9f2af';
+    const PASS_HASH = 'd1e06ddd9f87e14a703af58bec78f4b951ce9afa7a87c4da6727e452bc556118';
+
+    const hashString = async (string: string) => {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(string);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
+        setError('');
 
-        // Simulate login delay
-        setTimeout(() => {
+        try {
+            // Artificial delay to prevent timing attacks and simulate network request
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            const hashedEmail = await hashString(email);
+            const hashedPass = await hashString(password);
+
+            if (hashedEmail === USER_HASH && hashedPass === PASS_HASH) {
+                // Set authentication flag
+                localStorage.setItem('isAuthenticated', 'true');
+                // Store timestamp for session expiry (optional but good practice)
+                localStorage.setItem('loginTimestamp', Date.now().toString());
+                navigate('/admin');
+            } else {
+                setError('Invalid username or password');
+                setIsLoading(false);
+            }
+        } catch (err) {
+            setError('An error occurred during login');
             setIsLoading(false);
-            navigate('/admin');
-        }, 1500);
+        }
     };
 
     const containerVariants = {
@@ -98,6 +135,25 @@ export default function Login() {
                     <p style={{ color: 'var(--color-text-muted)' }}>Enter your credentials to access the admin panel.</p>
                 </motion.div>
 
+                {error && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        style={{
+                            background: 'rgba(239, 68, 68, 0.2)',
+                            border: '1px solid rgba(239, 68, 68, 0.5)',
+                            color: '#fca5a5', // light red
+                            padding: '0.75rem',
+                            borderRadius: '12px',
+                            marginBottom: '1.5rem',
+                            fontSize: '0.875rem',
+                            textAlign: 'center'
+                        }}
+                    >
+                        {error}
+                    </motion.div>
+                )}
+
                 <form onSubmit={handleSubmit}>
                     <motion.div variants={itemVariants} style={{ marginBottom: '1.5rem', position: 'relative' }}>
                         <label style={{
@@ -106,9 +162,9 @@ export default function Login() {
                             fontSize: '0.875rem',
                             fontWeight: 600,
                             color: 'var(--color-text)'
-                        }}>Email</label>
+                        }}>Username</label>
                         <div style={{ position: 'relative' }}>
-                            <Mail size={20} style={{
+                            <User size={20} style={{
                                 position: 'absolute',
                                 left: '1rem',
                                 top: '50%',
@@ -116,11 +172,11 @@ export default function Login() {
                                 color: 'var(--color-text-muted)'
                             }} />
                             <input
-                                type="email"
+                                type="text"
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder="admin@viralmedia.com"
+                                placeholder="adminviral"
                                 style={{
                                     width: '100%',
                                     padding: '1rem 1rem 1rem 3rem',

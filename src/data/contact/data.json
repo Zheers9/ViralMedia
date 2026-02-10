@@ -1,0 +1,16 @@
+[
+    {
+        "id": 1,
+        "name": "John Doe",
+        "email": "john@example.com",
+        "message": "Interested in video production services",
+        "date": "2024-01-20"
+    },
+    {
+        "id": 2,
+        "name": "Jane Smith",
+        "email": "jane@example.com",
+        "message": "Need help with social media campaign",
+        "date": "2024-01-22"
+    }
+]

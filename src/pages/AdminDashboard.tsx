@@ -21,27 +21,15 @@ import CustomCursor from '../components/CustomCursor';
 import StarField from '../components/StarField';
 import { ToastContainer, type ToastMessage, type ToastType } from '../components/Toast';
 
+
+
 // --- Types ---
 type Skill = { id: number; name: string; category: string };
-type Work = { id: number; title: string; description: string; image: string };
+type Work = { id: number; title: string; description: string; image: string; category?: string };
 type Contact = { id: number; name: string; email: string; message: string; date: string };
 
-// --- Mock Data for Initial State ---
-const initialSkills: Skill[] = [
-    { id: 1, name: 'Video Editing', category: 'Production' },
-    { id: 2, name: 'Social Media Marketing', category: 'Marketing' },
-    { id: 3, name: 'Graphic Design', category: 'Design' },
-];
-
-const initialWorks: Work[] = [
-    { id: 1, title: 'Campus Event 2024', description: 'Annual university celebration', image: 'https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400' },
-    { id: 2, title: 'Sports Highlights', description: 'Basketball championship coverage', image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400' },
-];
-
-const initialContacts: Contact[] = [
-    { id: 1, name: 'John Doe', email: 'john@example.com', message: 'Interested in video production services', date: '2024-01-20' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', message: 'Need help with social media campaign', date: '2024-01-22' },
-];
+// --- Constants ---
+const API_URL = 'http://localhost:3001/api';
 
 const initialStats = [
     { label: 'Total Views', value: '2.4M', change: '+12%', icon: Eye, color: '#fbbf24' },
@@ -202,26 +190,59 @@ const Modal = ({ isOpen, onClose, title, children }: { isOpen: boolean; onClose:
 // --- Sub-Components (Standard State) ---
 
 function SkillsSection({ showToast }: { showToast: (msg: string, type: ToastType) => void }) {
-    const [skills, setSkills] = useState<Skill[]>(initialSkills);
+    const [skills, setSkills] = useState<Skill[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingSkill, setEditingSkill] = useState<Skill | null>(null);
     const [skillToDelete, setSkillToDelete] = useState<number | null>(null);
     const [formData, setFormData] = useState({ name: '', category: '' });
 
-    const handleSave = () => {
+    const fetchSkills = async () => {
+        try {
+            const res = await fetch(`${API_URL}/skills`);
+            const data = await res.json();
+            if (Array.isArray(data)) setSkills(data);
+        } catch (err) {
+            console.error(err);
+            showToast("Failed to load skills", "error");
+        }
+    };
+
+    useState(() => {
+        fetchSkills();
+    });
+
+    const handleSave = async () => {
         if (!formData.name) {
             showToast("Please enter a skill name!", "error");
             return;
         }
 
-        if (editingSkill) {
-            setSkills(skills.map(s => s.id === editingSkill.id ? { ...s, ...formData } : s));
-            showToast("Skill updated successfully!", "success");
-        } else {
-            setSkills([...skills, { id: Date.now(), ...formData }]);
-            showToast("New skill added!", "success");
+        try {
+            let res;
+            if (editingSkill) {
+                res = await fetch(`${API_URL}/skills/${editingSkill.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+            } else {
+                res = await fetch(`${API_URL}/skills`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+            }
+
+            if (res.ok) {
+                showToast(editingSkill ? "Skill updated!" : "Skill added!", "success");
+                fetchSkills(); // Refresh
+                closeModal();
+            } else {
+                showToast("Failed to save skill", "error");
+            }
+        } catch (err) {
+            showToast("Error saving skill", "error");
         }
-        closeModal();
     };
 
     const openAddModal = () => {
@@ -242,11 +263,20 @@ function SkillsSection({ showToast }: { showToast: (msg: string, type: ToastType
         setFormData({ name: '', category: '' });
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (skillToDelete) {
-            setSkills(skills.filter(s => s.id !== skillToDelete));
-            setSkillToDelete(null);
-            showToast("Skill deleted successfully.", "success");
+            try {
+                const res = await fetch(`${API_URL}/skills/${skillToDelete}`, { method: 'DELETE' });
+                if (res.ok) {
+                    setSkills(skills.filter(s => s.id !== skillToDelete));
+                    setSkillToDelete(null);
+                    showToast("Skill deleted successfully.", "success");
+                } else {
+                    showToast("Failed to delete skill", "error");
+                }
+            } catch (err) {
+                showToast("Error deleting skill", "error");
+            }
         }
     };
 
@@ -254,9 +284,11 @@ function SkillsSection({ showToast }: { showToast: (msg: string, type: ToastType
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
                 <h2 style={{ fontSize: '1.75rem', fontWeight: 700 }}>Skills Management</h2>
-                <motion.button onClick={openAddModal} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '0.5rem 1rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Plus size={18} /> Add Skill
-                </motion.button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <motion.button onClick={openAddModal} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '0.5rem 1rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Plus size={18} /> Add Skill
+                    </motion.button>
+                </div>
             </div>
 
             {/* Add/Edit Modal */}
@@ -325,26 +357,82 @@ function SkillsSection({ showToast }: { showToast: (msg: string, type: ToastType
 }
 
 function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) => void }) {
-    const [works, setWorks] = useState<Work[]>(initialWorks);
+    const [works, setWorks] = useState<Work[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingWork, setEditingWork] = useState<Work | null>(null);
     const [workToDelete, setWorkToDelete] = useState<number | null>(null);
     const [formData, setFormData] = useState({ title: '', description: '', image: '' });
 
-    const handleSave = () => {
+    const fetchWorks = async () => {
+        try {
+            const res = await fetch(`${API_URL}/work`);
+            const data = await res.json();
+            if (Array.isArray(data)) setWorks(data);
+        } catch (err) {
+            showToast("Failed to load work", "error");
+        }
+    };
+
+    useState(() => {
+        fetchWorks();
+    });
+
+    const handleSave = async () => {
         if (!formData.title) {
             showToast("Please enter a project title!", "error");
             return;
         }
 
-        if (editingWork) {
-            setWorks(works.map(w => w.id === editingWork.id ? { ...w, ...formData } : w));
-            showToast("Project updated successfully!", "success");
-        } else {
-            setWorks([...works, { id: Date.now(), ...formData }]);
-            showToast("New project added!", "success");
+        try {
+            let res;
+            if (editingWork) {
+                res = await fetch(`${API_URL}/work/${editingWork.id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+            } else {
+                res = await fetch(`${API_URL}/work`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+            }
+
+            if (res.ok) {
+                showToast(editingWork ? "Project updated!" : "Project added!", "success");
+                fetchWorks();
+                closeModal();
+            } else {
+                showToast("Failed to save project", "error");
+            }
+        } catch (err) {
+            showToast("Error saving project", "error");
         }
-        closeModal();
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const res = await fetch(`${API_URL}/upload/work`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+            if (data.success) {
+                setFormData(prev => ({ ...prev, image: data.path }));
+                showToast("Image uploaded!", "success");
+            } else {
+                showToast("Upload failed", "error");
+            }
+        } catch (err) {
+            showToast("Error uploading image", "error");
+        }
     };
 
     const openAddModal = () => {
@@ -365,11 +453,20 @@ function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) 
         setFormData({ title: '', description: '', image: '' });
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (workToDelete) {
-            setWorks(works.filter(w => w.id !== workToDelete));
-            setWorkToDelete(null);
-            showToast("Project deleted.", "success");
+            try {
+                const res = await fetch(`${API_URL}/work/${workToDelete}`, { method: 'DELETE' });
+                if (res.ok) {
+                    setWorks(works.filter(w => w.id !== workToDelete));
+                    setWorkToDelete(null);
+                    showToast("Project deleted.", "success");
+                } else {
+                    showToast("Failed to delete project", "error");
+                }
+            } catch (err) {
+                showToast("Error deleting project", "error");
+            }
         }
     };
 
@@ -377,9 +474,11 @@ function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem' }}>
                 <h2 style={{ fontSize: '1.75rem', fontWeight: 700 }}>Work Portfolio</h2>
-                <motion.button onClick={openAddModal} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '0.5rem 1rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Plus size={18} /> Add Work
-                </motion.button>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    <motion.button onClick={openAddModal} whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} style={{ padding: '0.5rem 1rem', background: '#7c3aed', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <Plus size={18} /> Add Work
+                    </motion.button>
+                </div>
             </div>
 
             {/* Add/Edit Modal */}
@@ -394,8 +493,22 @@ function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) 
                         <input type="text" placeholder="Description" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
                     </div>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Image URL</label>
-                        <input type="text" placeholder="Image URL" value={formData.image} onChange={e => setFormData({ ...formData, image: e.target.value })} style={{ width: '100%', padding: '1rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', borderRadius: '12px', outline: 'none' }} />
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#9ca3af', fontSize: '0.9rem' }}>Image</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    style={{ color: 'white' }}
+                                />
+                            </div>
+                            {formData.image && (
+                                <div style={{ fontSize: '0.8rem', color: '#34d399' }}>
+                                    Current Image: {formData.image}
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <motion.button onClick={handleSave} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} style={{ marginTop: '1rem', padding: '1rem', background: 'linear-gradient(135deg, #7c3aed, #6d28d9)', border: 'none', borderRadius: '12px', color: 'white', fontWeight: 700, cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 15px rgba(124, 58, 237, 0.4)' }}>
                         {editingWork ? "Update Project" : "Add Project"}
@@ -434,14 +547,37 @@ function WorkSection({ showToast }: { showToast: (msg: string, type: ToastType) 
 }
 
 function ContactsSection({ showToast }: { showToast: (msg: string, type: ToastType) => void }) {
-    const [contacts, setContacts] = useState<Contact[]>(initialContacts);
+    const [contacts, setContacts] = useState<Contact[]>([]);
+
+    const fetchContacts = async () => {
+        try {
+            const res = await fetch(`${API_URL}/contact`);
+            const data = await res.json();
+            if (Array.isArray(data)) setContacts(data);
+        } catch (err) {
+            showToast("Failed to load contacts", "error");
+        }
+    };
+
+    useState(() => {
+        fetchContacts();
+    });
     const [contactToDelete, setContactToDelete] = useState<number | null>(null);
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         if (contactToDelete) {
-            setContacts(contacts.filter(c => c.id !== contactToDelete));
-            setContactToDelete(null);
-            showToast("Message deleted.", "success");
+            try {
+                const res = await fetch(`${API_URL}/contact/${contactToDelete}`, { method: 'DELETE' });
+                if (res.ok) {
+                    setContacts(contacts.filter(c => c.id !== contactToDelete));
+                    setContactToDelete(null);
+                    showToast("Message deleted.", "success");
+                } else {
+                    showToast("Failed to delete message", "error");
+                }
+            } catch (err) {
+                showToast("Error deleting message", "error");
+            }
         }
     };
 
@@ -540,7 +676,10 @@ export default function AdminDashboard() {
 
                 <div style={{ padding: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
                     <SidebarItem icon={Settings} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
-                    <SidebarItem icon={LogOut} label="Logout" active={false} onClick={() => window.location.href = '/'} />
+                    <SidebarItem icon={LogOut} label="Logout" active={false} onClick={() => {
+                        localStorage.removeItem('isAuthenticated');
+                        window.location.href = '/login';
+                    }} />
                 </div>
             </motion.aside>
 

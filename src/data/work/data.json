@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "title": "Campus Event 2024",
+        "description": "Annual university celebration",
+        "image": "https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=400",
+        "category": "Event"
+    },
+    {
+        "id": 2,
+        "title": "Sports Highlights",
+        "description": "Basketball championship coverage",
+        "image": "https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400",
+        "category": "Video"
+    },
+    {
+        "id": 3,
+        "title": "Science Fair Promo",
+        "description": "Innovation showcase",
+        "image": "https://images.unsplash.com/photo-1581093450021-4a7360e9a6b5?w=400",
+        "category": "Branding"
+    }
+]
