@@ -3,6 +3,13 @@ import { Camera, Share2, PenTool, Zap } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useLanguage } from '../context/LanguageContext';
+import skillsData from '../data/skills/data.json';
+
+const getImagePath = (path: string) => {
+    if (!path || path.startsWith('http')) return path;
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    return `${import.meta.env.BASE_URL}${cleanPath}`;
+};
 
 export default function Services() {
     const { t } = useLanguage();
@@ -47,25 +54,29 @@ export default function Services() {
             }
         ];
 
+        const processData = (data: any[]) => {
+            if (Array.isArray(data) && data.length > 0) {
+                return data.map((skill: any, index: number) => ({
+                    icon: getIconForIndex(index),
+                    title: skill.name,
+                    desc: skill.description || (index < defaultServices.length ? defaultServices[index].desc : ""),
+                    bgImage: getImagePath(skill.image || (index < defaultServices.length ? defaultServices[index].bgImage : ""))
+                }));
+            }
+            return defaultServices;
+        };
+
+        // Initialize with static data immediately
+        setServices(processData(skillsData));
+
+        // Try to fetch fresh data
         const fetchSkills = async () => {
             try {
                 const res = await fetch('http://localhost:3001/api/skills');
                 const data = await res.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    const mappedServices = data.map((skill: any, index: number) => ({
-                        icon: getIconForIndex(index),
-                        title: skill.name,
-                        desc: skill.description || (index < defaultServices.length ? defaultServices[index].desc : ""),
-                        bgImage: skill.image || (index < defaultServices.length ? defaultServices[index].bgImage : "")
-                    }));
-                    setServices(mappedServices);
-                } else {
-                    // Fallback to default if no data
-                    setServices(defaultServices);
-                }
-            } catch (err) {
-                console.error("Failed to load skills", err);
-                setServices(defaultServices);
+                setServices(processData(data));
+            } catch {
+                console.log("Using static services data");
             }
         };
         fetchSkills();

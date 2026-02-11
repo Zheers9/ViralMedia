@@ -2,17 +2,27 @@ import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 
+import workData from '../data/work/data.json';
+
+const getImagePath = (path: string) => {
+    if (!path || path.startsWith('http')) return path;
+    const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+    return `${import.meta.env.BASE_URL}${cleanPath}`;
+};
+
 export default function Portfolio() {
     const { t } = useLanguage();
 
-    const [projects, setProjects] = useState<any[]>([]);
+    const [projects, setProjects] = useState<any[]>(workData);
     const [selectedProject, setSelectedProject] = useState<any | null>(null);
 
     useEffect(() => {
+        // Optional: specific logic if needed on mount, but data is now static
+        // Keep fetch if you want to support local dynamic updates, but fallback is handled by initial state
         fetch('http://localhost:3001/api/work')
             .then(res => res.json())
             .then(data => setProjects(data))
-            .catch(err => console.error("Failed to load portfolio", err));
+            .catch(() => console.log("Using static portfolio data"));
     }, []);
 
     return (
@@ -51,7 +61,7 @@ export default function Portfolio() {
                             style={{
                                 height: '300px',
                                 backgroundColor: '#1a1a1a', // Fallback color
-                                backgroundImage: project.image ? `url('${project.image}')` : undefined,
+                                backgroundImage: project.image ? `url('${getImagePath(project.image)}')` : undefined,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                                 borderRadius: '16px',
@@ -116,7 +126,7 @@ export default function Portfolio() {
                             {selectedProject.image && (
                                 <div style={{ maxHeight: '420px', overflow: 'hidden', position: 'relative' }}>
                                     <motion.img
-                                        src={selectedProject.image}
+                                        src={getImagePath(selectedProject.image)}
                                         alt={selectedProject.title}
                                         initial={{ scale: 1.05, y: 0 }}
                                         animate={{
