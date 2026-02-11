@@ -1,3 +1,10 @@
+@font-face {
+  font-family: 'Noto Kufi Arabic';
+  src: url('./assets/NotoKufiArabic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
 :root {
   --color-bg: #0f0b1e;
   --color-purple-primary: #7c3aed;
@@ -7,7 +14,7 @@
   --color-text: #f3f4f6;
   --color-text-muted: #9ca3af;
 
-  --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-main: 'Noto Kufi Arabic', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 * {
