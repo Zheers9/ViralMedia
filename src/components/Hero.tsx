@@ -129,7 +129,6 @@ export default function Hero() {
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',
                         letterSpacing: '-0.02em',
-                        fontFamily: "'Inter', sans-serif"
                     }}
                 >
                     {t('hero_title_1')} <span style={{ color: 'transparent', WebkitTextStroke: '2px #fbbf24' }}>{t('hero_title_2')}</span>
