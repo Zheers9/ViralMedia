@@ -245,8 +245,8 @@ export const translations = {
         settings_subtitle: "قم بتكوين تفضيلات لوحة التحكم الخاصة بك هنا.",
 
         // Hero Section
-        hero_title_1: 'فايرال',
-        hero_title_2: 'ميديا',
+        hero_title_1: 'VIRAL',
+        hero_title_2: 'MEDIA',
         hero_subtitle: 'إعادة اختراع الإعلام الجامعي بإبداع صادم',
         hero_explore: 'استكشف أعمالنا',
 
@@ -394,8 +394,8 @@ export const translations = {
         settings_subtitle: "ڕێکخستنەکانی داشبۆردەکەت لێرە دیاری بکە.",
 
         // Hero Section
-        hero_title_1: 'ڤایراڵ',
-        hero_title_2: 'میدیا',
+        hero_title_1: 'VIRAL',
+        hero_title_2: 'MEDIA',
         hero_subtitle: 'نوێکردنەوەی میدیای زانکۆ بە داهێنانێکی شۆککەر',
         hero_explore: 'کارەکانمان ببینە',
 
